@@ -11,13 +11,31 @@ class LeagueView(APIView):
     serializer_class = LeagueSerializer
   
     def get(self, request):
-        league = [ {'code':league.code, 'host': league.host, 'Espn_League_Id': league.Espn_League_Id,'Espn_S2': league.Espn_S2,'Espn_SWID': Espn_SWID } 
+        league = [ {'code':league.code, 'host': league.host, 'Espn_League_Id': league.Espn_League_Id,'Espn_S2': league.Espn_S2,'Espn_Swid': league.Espn_Swid} 
         for league in League.objects.all()]
         return Response(league)
   
     def post(self, request):
-  
+        print(request)
         serializer = LeagueSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
             return  Response(serializer.data)
+
+class LeagueDetail(APIView):
+    """
+    Retrieve, update or delete a transformer instance
+    """
+    def get_object(self, league_id):
+        # Returns an object instance that should 
+        # be used for detail views.
+        try:
+            return League.objects.get(id=league_id)
+        except League.DoesNotExist:
+            raise Http404
+  
+    def get(self, request, league_id, format=None):
+        league = self.get_object(league_id)
+        serializer = LeagueSerializer(league)
+        return Response(serializer.data)
+  
