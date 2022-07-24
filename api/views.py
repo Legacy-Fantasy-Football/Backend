@@ -23,9 +23,6 @@ class LeagueView(APIView):
             return  Response(serializer.data)
 
 class LeagueDetail(APIView):
-    """
-    Retrieve, update or delete a transformer instance
-    """
     def get_object(self, espn_league_id):
         # Returns an object instance that should 
         # be used for detail views.
@@ -38,4 +35,17 @@ class LeagueDetail(APIView):
         league = self.get_object(espn_league_id)
         serializer = LeagueSerializer(league)
         return Response(serializer.data)
+
+    def put(self, request, espn_league_id, format=None):
+        league = self.get_object(espn_league_id)
+        serializer = LeagueSerializer(league, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+  
+    def delete(self, request, espn_league_id, format=None):
+        league = self.get_object(espn_league_id)
+        league.delete()
+        return Response('league is deleted')
   
