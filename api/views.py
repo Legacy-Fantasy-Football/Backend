@@ -26,16 +26,16 @@ class LeagueDetail(APIView):
     """
     Retrieve, update or delete a transformer instance
     """
-    def get_object(self, league_id):
+    def get_object(self, espn_league_id):
         # Returns an object instance that should 
         # be used for detail views.
         try:
-            return League.objects.get(id=league_id)
+            return League.objects.get(Espn_League_Id=espn_league_id)
         except League.DoesNotExist:
             raise Http404
   
-    def get(self, request, league_id, format=None):
-        league = self.get_object(league_id)
+    def get(self, request, espn_league_id, format=None):
+        league = self.get_object(espn_league_id)
         serializer = LeagueSerializer(league)
         return Response(serializer.data)
   
