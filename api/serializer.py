@@ -9,7 +9,7 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
   
 class LeagueSerializer(serializers.ModelSerializer):
     class Meta:
-        model = League
+        model = League_Mod
         fields = ['code','host', 'Espn_League_Id','Espn_S2','Espn_Swid']
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):

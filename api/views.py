@@ -18,7 +18,7 @@ class LeagueView(APIView):
   
     def get(self, request):
         league = [ {'code':league.code, 'host': league.host, 'Espn_League_Id': league.Espn_League_Id,'Espn_S2': league.Espn_S2,'Espn_Swid': league.Espn_Swid} 
-        for league in League.objects.all()]
+        for league in League_Mod.objects.all()]
         return Response(league)
   
     def post(self, request):
@@ -33,8 +33,8 @@ class LeagueDetail(APIView):
         # Returns an object instance that should 
         # be used for detail views.
         try:
-            return League.objects.get(Espn_League_Id=espn_league_id)
-        except League.DoesNotExist:
+            return League_Mod.objects.get(Espn_League_Id=espn_league_id)
+        except League_Mod.DoesNotExist:
             raise Http404
   
     def get(self, request, espn_league_id, format=None):
