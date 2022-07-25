@@ -22,4 +22,5 @@ urlpatterns = [
     path('accounts/', include('django.contrib.auth.urls')),
     path('wel/', LeagueView.as_view(), name="something"),
     path('wel/<int:espn_league_id>/', LeagueDetail.as_view(), name="leagueDetail"),
+    path('api/', include("api.urls")),
 ]
