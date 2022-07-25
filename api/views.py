@@ -10,6 +10,8 @@ from rest_framework import generics
 from django.contrib.auth.models import User
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes
+from espn_api.football import League
+import re
 # Create your views here.
   
 class LeagueView(APIView):
@@ -22,8 +24,27 @@ class LeagueView(APIView):
         return Response(league)
   
     def post(self, request):
-        print(request)
+        print(request.data['Espn_League_Id'])
         serializer = LeagueSerializer(data=request.data)
+
+        instanceOwners=[]
+        years= [2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021]
+
+        currentOwners = []
+        Owners = {
+
+        }
+        for year in years:
+            league = League(league_id=request.data['Espn_League_Id'], year=year,espn_s2='AEAylLD7uSQQ7%2BenPr6av1H%2Fx0Hqbbpn8Jvr91ngxM1ll5ynO685mhN%2BSujz9I1IyJ6B1aZWsLiMmuPsdFk71SYQkvPUHFtQUQgN1rEs1mw%2FpRA8iI91nOAVwg1hfGb6TsZtvTJ9XHRr8C3E6uwLX4Yep2Pet%2FYN8%2BDm3QO8mSqXzfPkyS%2BsX50Mc5uvzCgV4r1pLIRXr%2FqnlfTiWHYCgZniEerPTLNhQaKqgaHAVPjCWUdZcPncMY6n9EX1eQnpB17eCXyP%2Fq4DXNNuRnASpnl%2ByoPm2%2Babp9yBTSJOy4N5zg%3D%3D', swid='{D19D67CA-C981-4CA2-8463-AF4111D2E8E2}')
+
+            teams = league.teams
+
+            # Creates list of every owner
+            for team in teams:
+                if re.sub(' +', ' ',team.owner) not in instanceOwners:
+                        instanceOwners.append(re.sub(' +', ' ',team.owner))
+            
+            print(instanceOwners)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
             return  Response(serializer.data)
