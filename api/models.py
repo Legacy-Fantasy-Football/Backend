@@ -18,4 +18,4 @@ class League(models.Model):
     host = models.CharField(max_length=50)
     Espn_League_Id = models.IntegerField(null=False)
     Espn_S2 = models.CharField(max_length=3000)
-    Espn_Swid = models.CharField(max_length=300)
+    Espn_Swid = models.CharField(max_length=300) 

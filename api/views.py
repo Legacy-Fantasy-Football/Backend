@@ -42,7 +42,7 @@ class LeagueDetail(APIView):
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response('league was updated')
   
     def delete(self, request, espn_league_id, format=None):
         league = self.get_object(espn_league_id)
