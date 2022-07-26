@@ -14,9 +14,8 @@ def generate_unique_code():
 
 # Create your models here.
 class League_Mod(models.Model):
-    code = models.CharField(max_length=8, default=generate_unique_code, unique = True)
     host = models.CharField(max_length=50)
-    Espn_League_Id = models.IntegerField(null=False, unique = True)
+    Espn_League_Id = models.IntegerField(unique = True)
     Espn_S2 = models.CharField(max_length=3000)
     Espn_Swid = models.CharField(max_length=300) 
-    bigdata = models.TextField(default = "",blank=True)
+    bigdata = models.JSONField(default=dict,null=True)

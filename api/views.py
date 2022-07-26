@@ -19,7 +19,7 @@ class LeagueView(APIView):
     serializer_class = LeagueSerializer
   
     def get(self, request):
-        league = [ {'code':league.code, 'host': league.host, 'Espn_League_Id': league.Espn_League_Id,'Espn_S2': league.Espn_S2,'Espn_Swid': league.Espn_Swid} 
+        league = [ {'host': league.host, 'Espn_League_Id': league.Espn_League_Id,'Espn_S2': league.Espn_S2,'Espn_Swid': league.Espn_Swid, 'bigdata': league.bigdata} 
         for league in League_Mod.objects.all()]
         return Response(league)
   
@@ -75,12 +75,11 @@ class LeagueView(APIView):
 
             currentOwners = []
         league_data = {
-            'code' : request.data['code'],
             'host' : request.data['host'],
             'Espn_League_Id' :request.data['Espn_League_Id'],
             'Espn_S2' : request.data['Espn_S2'],
             'Espn_Swid' : request.data['Espn_Swid'],
-            'bigdata' : Owners
+            'bigdata' : Owners,
         }
         # request.data['BigData'] = Owners
         serializer = LeagueSerializer(data=league_data)
