@@ -26,14 +26,15 @@ class LeagueView(APIView):
     def post(self, request):
 
         instanceOwners=[]
-        year = 2010
+        year = int(request.data['year_started'])
+        print(year)
         currentOwners = []
         Owners = {
 
         }
         ##### Dicitonaries of Total Wins By Week #######
         while year < 2022:
-            league = League(league_id=216415, year=year,espn_s2='AEAylLD7uSQQ7%2BenPr6av1H%2Fx0Hqbbpn8Jvr91ngxM1ll5ynO685mhN%2BSujz9I1IyJ6B1aZWsLiMmuPsdFk71SYQkvPUHFtQUQgN1rEs1mw%2FpRA8iI91nOAVwg1hfGb6TsZtvTJ9XHRr8C3E6uwLX4Yep2Pet%2FYN8%2BDm3QO8mSqXzfPkyS%2BsX50Mc5uvzCgV4r1pLIRXr%2FqnlfTiWHYCgZniEerPTLNhQaKqgaHAVPjCWUdZcPncMY6n9EX1eQnpB17eCXyP%2Fq4DXNNuRnASpnl%2ByoPm2%2Babp9yBTSJOy4N5zg%3D%3D', swid='{D19D67CA-C981-4CA2-8463-AF4111D2E8E2}')
+            league = League(league_id=request.data['Espn_League_Id'], year=year,espn_s2=request.data['Espn_S2'], swid=request.data['Espn_Swid'])
             teams = league.teams
             # Creates list of every owner
             for team in teams:
@@ -43,7 +44,7 @@ class LeagueView(APIView):
             year += 1
         year=2010
         while year < 2022:
-            league = League(league_id=216415, year=year,espn_s2='AEAylLD7uSQQ7%2BenPr6av1H%2Fx0Hqbbpn8Jvr91ngxM1ll5ynO685mhN%2BSujz9I1IyJ6B1aZWsLiMmuPsdFk71SYQkvPUHFtQUQgN1rEs1mw%2FpRA8iI91nOAVwg1hfGb6TsZtvTJ9XHRr8C3E6uwLX4Yep2Pet%2FYN8%2BDm3QO8mSqXzfPkyS%2BsX50Mc5uvzCgV4r1pLIRXr%2FqnlfTiWHYCgZniEerPTLNhQaKqgaHAVPjCWUdZcPncMY6n9EX1eQnpB17eCXyP%2Fq4DXNNuRnASpnl%2ByoPm2%2Babp9yBTSJOy4N5zg%3D%3D', swid='{D19D67CA-C981-4CA2-8463-AF4111D2E8E2}')
+            league = League(league_id=request.data['Espn_League_Id'], year=year,espn_s2=request.data['Espn_S2'], swid=request.data['Espn_Swid'])
 
             teams = league.teams
             for team in teams:
@@ -81,7 +82,7 @@ class LeagueView(APIView):
 
         for owner in Owners:
             # wins = owners[owner][2010] + owners[owner][2011] + owners[owner][2012] + owners[owner][2013] + owners[owner][2014] + owners[owner][2015] + owners[owner][2016] + owners[owner][2017] + owners[owner][2018] + owners[owner][2019] + owners[owner][2020] + owners[owner][2021]
-            startyear = 2010
+            startyear = int(request.data['year_started'])
             wins = []
             while startyear < 2022:
                 for item in Owners[owner][startyear]:
@@ -101,7 +102,7 @@ class LeagueView(APIView):
             }
 
             week = 0
-            year = 2010
+            year = int(request.data['year_started'])
             for win in wins: 
                 week+= 1
                 if week == 17:
