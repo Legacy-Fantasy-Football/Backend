@@ -26,23 +26,24 @@ class LeagueView(APIView):
     def post(self, request):
 
         instanceOwners=[]
-        years= [2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021]
-
+        year = 2010
         currentOwners = []
         Owners = {
 
         }
-        for year in years:
-            league = League(league_id=request.data['Espn_League_Id'], year=year,espn_s2=request.data['Espn_S2'], swid=request.data['Espn_Swid'])
-
+        ##### Dicitonaries of Total Wins By Week #######
+        while year < 2022:
+            league = League(league_id=216415, year=year,espn_s2='AEAylLD7uSQQ7%2BenPr6av1H%2Fx0Hqbbpn8Jvr91ngxM1ll5ynO685mhN%2BSujz9I1IyJ6B1aZWsLiMmuPsdFk71SYQkvPUHFtQUQgN1rEs1mw%2FpRA8iI91nOAVwg1hfGb6TsZtvTJ9XHRr8C3E6uwLX4Yep2Pet%2FYN8%2BDm3QO8mSqXzfPkyS%2BsX50Mc5uvzCgV4r1pLIRXr%2FqnlfTiWHYCgZniEerPTLNhQaKqgaHAVPjCWUdZcPncMY6n9EX1eQnpB17eCXyP%2Fq4DXNNuRnASpnl%2ByoPm2%2Babp9yBTSJOy4N5zg%3D%3D', swid='{D19D67CA-C981-4CA2-8463-AF4111D2E8E2}')
             teams = league.teams
-
             # Creates list of every owner
             for team in teams:
                 if re.sub(' +', ' ',team.owner) not in instanceOwners:
                         instanceOwners.append(re.sub(' +', ' ',team.owner))
-        for year in years:
-            league =  League(league_id=request.data['Espn_League_Id'], year=year,espn_s2=request.data['Espn_S2'], swid=request.data['Espn_Swid'])
+            print(year)
+            year += 1
+        year=2010
+        while year < 2022:
+            league = League(league_id=216415, year=year,espn_s2='AEAylLD7uSQQ7%2BenPr6av1H%2Fx0Hqbbpn8Jvr91ngxM1ll5ynO685mhN%2BSujz9I1IyJ6B1aZWsLiMmuPsdFk71SYQkvPUHFtQUQgN1rEs1mw%2FpRA8iI91nOAVwg1hfGb6TsZtvTJ9XHRr8C3E6uwLX4Yep2Pet%2FYN8%2BDm3QO8mSqXzfPkyS%2BsX50Mc5uvzCgV4r1pLIRXr%2FqnlfTiWHYCgZniEerPTLNhQaKqgaHAVPjCWUdZcPncMY6n9EX1eQnpB17eCXyP%2Fq4DXNNuRnASpnl%2ByoPm2%2Babp9yBTSJOy4N5zg%3D%3D', swid='{D19D67CA-C981-4CA2-8463-AF4111D2E8E2}')
 
             teams = league.teams
             for team in teams:
@@ -74,12 +75,52 @@ class LeagueView(APIView):
                         Owners[owner][year].append(Owners[owner]['count']) 
 
             currentOwners = []
+            year += 1
+
+        Chartdata = []
+
+        for owner in Owners:
+            # wins = owners[owner][2010] + owners[owner][2011] + owners[owner][2012] + owners[owner][2013] + owners[owner][2014] + owners[owner][2015] + owners[owner][2016] + owners[owner][2017] + owners[owner][2018] + owners[owner][2019] + owners[owner][2020] + owners[owner][2021]
+            startyear = 2010
+            wins = []
+            while startyear < 2022:
+                for item in Owners[owner][startyear]:
+                    wins.append(item)
+                
+                startyear += 1
+            
+            # print(wins)
+            
+            ownerdic = {
+                'type': "spline",
+                'visible': True,
+                'showInLegend': True,
+                'yValueFormatString': "## wins",
+                'name': owner,
+                'dataPoints': []
+            }
+
+            week = 0
+            year = 2010
+            for win in wins: 
+                week+= 1
+                if week == 17:
+                    week = 1
+                    year += 1
+                dic = {
+                    'label': f"{year} Week {week}",
+                    'y': win
+                }
+                ownerdic['dataPoints'].append(dic)
+            Chartdata.append(ownerdic)
+        # print(data)
+
         league_data = {
             'host' : request.data['host'],
             'Espn_League_Id' :request.data['Espn_League_Id'],
             'Espn_S2' : request.data['Espn_S2'],
             'Espn_Swid' : request.data['Espn_Swid'],
-            'bigdata' : Owners,
+            'bigdata' : Chartdata,
         }
         # request.data['BigData'] = Owners
         serializer = LeagueSerializer(data=league_data)
