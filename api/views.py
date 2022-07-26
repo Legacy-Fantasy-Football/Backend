@@ -24,8 +24,6 @@ class LeagueView(APIView):
         return Response(league)
   
     def post(self, request):
-        print(request.data['Espn_League_Id'])
-        serializer = LeagueSerializer(data=request.data)
 
         instanceOwners=[]
         years= [2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021]
@@ -35,7 +33,7 @@ class LeagueView(APIView):
 
         }
         for year in years:
-            league = League(league_id=request.data['Espn_League_Id'], year=year,espn_s2='AEAylLD7uSQQ7%2BenPr6av1H%2Fx0Hqbbpn8Jvr91ngxM1ll5ynO685mhN%2BSujz9I1IyJ6B1aZWsLiMmuPsdFk71SYQkvPUHFtQUQgN1rEs1mw%2FpRA8iI91nOAVwg1hfGb6TsZtvTJ9XHRr8C3E6uwLX4Yep2Pet%2FYN8%2BDm3QO8mSqXzfPkyS%2BsX50Mc5uvzCgV4r1pLIRXr%2FqnlfTiWHYCgZniEerPTLNhQaKqgaHAVPjCWUdZcPncMY6n9EX1eQnpB17eCXyP%2Fq4DXNNuRnASpnl%2ByoPm2%2Babp9yBTSJOy4N5zg%3D%3D', swid='{D19D67CA-C981-4CA2-8463-AF4111D2E8E2}')
+            league = League(league_id=request.data['Espn_League_Id'], year=year,espn_s2=request.data['Espn_S2'], swid=request.data['Espn_Swid'])
 
             teams = league.teams
 
@@ -43,8 +41,50 @@ class LeagueView(APIView):
             for team in teams:
                 if re.sub(' +', ' ',team.owner) not in instanceOwners:
                         instanceOwners.append(re.sub(' +', ' ',team.owner))
+        for year in years:
+            league =  League(league_id=request.data['Espn_League_Id'], year=year,espn_s2=request.data['Espn_S2'], swid=request.data['Espn_Swid'])
+
+            teams = league.teams
+            for team in teams:
+                currentOwners.append(re.sub(' +', ' ',team.owner))
+
+            for owner in instanceOwners:
+                if owner not in Owners:
+                    Owners[re.sub(' +', ' ',owner)] = {'count':0,year:[]}
+                else:
+                    Owners[re.sub(' +', ' ',owner)].update({year:[]})
+
+            weeks = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16]
+                
+            for week in weeks:
+                matchups = league.scoreboard(week)
+
+                for matchup in matchups:
+                    if matchup.home_score > matchup.away_score:
+                        Owners[re.sub(' +', ' ',matchup.home_team.owner)]['count'] = Owners[re.sub(' +', ' ',matchup.home_team.owner)]['count'] + 1
+                        Owners[re.sub(' +', ' ',matchup.home_team.owner)][year].append(Owners[re.sub(' +', ' ',matchup.home_team.owner)]['count'])
+                        Owners[re.sub(' +', ' ',matchup.away_team.owner)][year].append(Owners[re.sub(' +', ' ',matchup.away_team.owner)]['count'])
+                    else:
+                        Owners[re.sub(' +', ' ',matchup.away_team.owner)]['count'] = Owners[re.sub(' +', ' ',matchup.away_team.owner)]['count'] + 1
+                        Owners[re.sub(' +', ' ',matchup.away_team.owner)][year].append(Owners[re.sub(' +', ' ',matchup.away_team.owner)]['count'])
+                        Owners[re.sub(' +', ' ',matchup.home_team.owner)][year].append(Owners[re.sub(' +', ' ',matchup.home_team.owner)]['count'])
             
-            print(instanceOwners)
+                for owner in instanceOwners:
+                    if owner not in currentOwners:
+                        Owners[owner][year].append(Owners[owner]['count']) 
+
+            currentOwners = []
+        league_data = {
+            'code' : request.data['code'],
+            'host' : request.data['host'],
+            'Espn_League_Id' :request.data['Espn_League_Id'],
+            'Espn_S2' : request.data['Espn_S2'],
+            'Espn_Swid' : request.data['Espn_Swid'],
+            'bigdata' : Owners
+        }
+        # request.data['BigData'] = Owners
+        serializer = LeagueSerializer(data=league_data)
+        print(serializer)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
             return  Response(serializer.data)

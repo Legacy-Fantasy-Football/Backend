@@ -19,3 +19,4 @@ class League_Mod(models.Model):
     Espn_League_Id = models.IntegerField(null=False, unique = True)
     Espn_S2 = models.CharField(max_length=3000)
     Espn_Swid = models.CharField(max_length=300) 
+    bigdata = models.TextField(default = "",blank=True)
