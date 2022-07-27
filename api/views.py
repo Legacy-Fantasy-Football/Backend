@@ -19,7 +19,7 @@ class LeagueView(APIView):
     serializer_class = LeagueSerializer
   
     def get(self, request):
-        league = [ {'host': league.host, 'Espn_League_Id': league.Espn_League_Id,'Espn_S2': league.Espn_S2,'Espn_Swid': league.Espn_Swid, 'bigdata': league.bigdata} 
+        league = [ {'host': league.host, 'year_started': league.year_started, 'Espn_League_Id': league.Espn_League_Id,'Espn_S2': league.Espn_S2,'Espn_Swid': league.Espn_Swid, 'bigdata': league.bigdata} 
         for league in League_Mod.objects.all()]
         return Response(league)
   
@@ -78,50 +78,51 @@ class LeagueView(APIView):
             currentOwners = []
             year += 1
 
-        Chartdata = []
+        # Chartdata = []
 
-        for owner in Owners:
-            # wins = owners[owner][2010] + owners[owner][2011] + owners[owner][2012] + owners[owner][2013] + owners[owner][2014] + owners[owner][2015] + owners[owner][2016] + owners[owner][2017] + owners[owner][2018] + owners[owner][2019] + owners[owner][2020] + owners[owner][2021]
-            startyear = int(request.data['year_started'])
-            wins = []
-            while startyear < 2022:
-                for item in Owners[owner][startyear]:
-                    wins.append(item)
+        # for owner in Owners:
+        #     # wins = owners[owner][2010] + owners[owner][2011] + owners[owner][2012] + owners[owner][2013] + owners[owner][2014] + owners[owner][2015] + owners[owner][2016] + owners[owner][2017] + owners[owner][2018] + owners[owner][2019] + owners[owner][2020] + owners[owner][2021]
+        #     startyear = int(request.data['year_started'])
+        #     wins = []
+        #     while startyear < 2022:
+        #         for item in Owners[owner][startyear]:
+        #             wins.append(item)
                 
-                startyear += 1
+        #         startyear += 1
             
-            # print(wins)
+        #     # print(wins)
             
-            ownerdic = {
-                'type': "spline",
-                'visible': True,
-                'showInLegend': True,
-                'yValueFormatString': "## wins",
-                'name': owner,
-                'dataPoints': []
-            }
+        #     ownerdic = {
+        #         'type': "spline",
+        #         'visible': True,
+        #         'showInLegend': True,
+        #         'yValueFormatString': "## wins",
+        #         'name': owner,
+        #         'dataPoints': []
+        #     }
 
-            week = 0
-            year = int(request.data['year_started'])
-            for win in wins: 
-                week+= 1
-                if week == 17:
-                    week = 1
-                    year += 1
-                dic = {
-                    'label': f"{year} Week {week}",
-                    'y': win
-                }
-                ownerdic['dataPoints'].append(dic)
-            Chartdata.append(ownerdic)
-        # print(data)
+        #     week = 0
+        #     year = int(request.data['year_started'])
+        #     for win in wins: 
+        #         week+= 1
+        #         if week == 17:
+        #             week = 1
+        #             year += 1
+        #         dic = {
+        #             'label': f"{year} Week {week}",
+        #             'y': win
+        #         }
+        #         ownerdic['dataPoints'].append(dic)
+        #     Chartdata.append(ownerdic)
+        # # print(data)
 
         league_data = {
             'host' : request.data['host'],
+            'year_started': request.data['year_started'],
             'Espn_League_Id' :request.data['Espn_League_Id'],
             'Espn_S2' : request.data['Espn_S2'],
             'Espn_Swid' : request.data['Espn_Swid'],
-            'bigdata' : Chartdata,
+            'bigdata' : Owners,
         }
         # request.data['BigData'] = Owners
         serializer = LeagueSerializer(data=league_data)
@@ -134,6 +135,61 @@ class LeagueDetail(APIView):
     def get_object(self, espn_league_id):
         # Returns an object instance that should 
         # be used for detail views.
+        # Owners = League_Mod.objects.get(Espn_League_Id=espn_league_id).bigdata
+        # Chartdata = []
+        # # print(Owners['Jordan Freundlich'][startyear])
+
+        # for owner in Owners:
+        # #     # print(type(owner))
+        # #   
+        #     startyearget = League_Mod.objects.get(Espn_League_Id=espn_league_id).year_started
+        #     startyearint = int(startyearget)
+        #     startyearstr = str(startyearget)
+        #     wins = []
+        #     while startyearint < 2022:
+        #         # print(startyearint)
+        #         for item in Owners[owner][startyearstr]:
+        #             # print(item)
+        #             startyearint += 1
+        #             wins.append(item)
+        #             startyearint += 1
+        #     # print(wins)
+            
+        #     ownerdic = {
+        #         'type': "spline",
+        #         'visible': True,
+        #         'showInLegend': True,
+        #         'yValueFormatString': "## wins",
+        #         'name': owner,
+        #         'dataPoints': []
+        #     }
+
+        #     week = 0
+        #     yearget = League_Mod.objects.get(Espn_League_Id=espn_league_id).year_started
+        #     yearint = int(yearget)
+        #     for win in wins: 
+        #         week+= 1
+        #         if week == 17:
+        #             week = 1
+        #             yearint += 1
+        #         dic = {
+        #             'label': f"{yearint} Week {week}",
+        #             'y': win
+        #         }
+        #         ownerdic['dataPoints'].append(dic)
+        #     Chartdata.append(ownerdic)
+        # # print(Chartdata)
+
+        # leagueDetail = {
+        #     'host' : League_Mod.objects.get(Espn_League_Id=espn_league_id).host,
+        #     'year_started': League_Mod.objects.get(Espn_League_Id=espn_league_id).year_started,
+        #     'Espn_League_Id' :League_Mod.objects.get(Espn_League_Id=espn_league_id).Espn_League_Id,
+        #     'bigdata' : Chartdata
+        # }
+
+        # print(leagueDetail)
+
+        # print(League_Mod.objects.get(Espn_League_Id=espn_league_id).bigdata)
         try:
             return League_Mod.objects.get(Espn_League_Id=espn_league_id)
         except League_Mod.DoesNotExist:
@@ -141,7 +197,64 @@ class LeagueDetail(APIView):
   
     def get(self, request, espn_league_id, format=None):
         league = self.get_object(espn_league_id)
-        serializer = LeagueSerializer(league)
+
+        Owners = League_Mod.objects.get(Espn_League_Id=espn_league_id).bigdata
+        Chartdata = []
+        # print(Owners['Jordan Freundlich'][startyear])
+
+        for owner in Owners:
+        #     # print(type(owner))
+        #   
+            startyearget = League_Mod.objects.get(Espn_League_Id=espn_league_id).year_started
+            startyearint = int(startyearget)
+            startyearstr = str(startyearget)
+            wins = []
+            while startyearint < 2022:
+                # print(startyearint)
+                for item in Owners[owner][str(startyearint)]:
+                    wins.append(item)
+                print(startyearint)
+                startyearint += 1
+            print(wins)
+            
+            ownerdic = {
+                'type': "spline",
+                'visible': True,
+                'showInLegend': True,
+                'yValueFormatString': "## wins",
+                'name': owner,
+                'dataPoints': []
+            }
+
+            week = 0
+            yearget = League_Mod.objects.get(Espn_League_Id=espn_league_id).year_started
+            yearint = int(yearget)
+            for win in wins: 
+                week+= 1
+                if week == 17:
+                    week = 1
+                    yearint += 1
+                dic = {
+                    'label': f"{yearint} Week {week}",
+                    'y': win
+                }
+                ownerdic['dataPoints'].append(dic)
+            Chartdata.append(ownerdic)
+        print(Chartdata)
+
+        leagueDetail = {
+            'host' : League_Mod.objects.get(Espn_League_Id=espn_league_id).host,
+            'Espn_S2': League_Mod.objects.get(Espn_League_Id=espn_league_id).Espn_S2,
+            'Espn_Swid': League_Mod.objects.get(Espn_League_Id=espn_league_id).Espn_Swid,
+            'year_started': League_Mod.objects.get(Espn_League_Id=espn_league_id).year_started,
+            'Espn_League_Id' :League_Mod.objects.get(Espn_League_Id=espn_league_id).Espn_League_Id,
+            'bigdata' : Chartdata
+        }
+
+        # print(leagueDetail)
+
+
+        serializer = LeagueSerializer(leagueDetail)
         return Response(serializer.data)
 
     def put(self, request, espn_league_id, format=None):
