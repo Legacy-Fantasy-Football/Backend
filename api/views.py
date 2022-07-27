@@ -47,10 +47,10 @@ class LeagueView(APIView):
             league = League(league_id=request.data['Espn_League_Id'], year=year,espn_s2=request.data['Espn_S2'], swid=request.data['Espn_Swid'])
             team_count = league.settings.team_count
             playoff_team_count = league.settings.playoff_team_count
-
+            teams = league.teams
             for owner in instanceOwners:
                 if owner not in Owners:
-                    Owners[re.sub(' +', ' ',owner)] = {'yearsPlayed':0,'count':0,'champ':0, 'finals': 0,'madePlayoffs':0,'points_for':0,'points_against': 0,'legacypoints':0,year:[]}
+                    Owners[re.sub(' +', ' ',owner)] = {'name': owner,'yearsPlayed':0,'count':0,'champ':0, 'finals': 0,'madePlayoffs':0,'points_for':0,'points_against': 0,'legacypoints':0,year:[]}
                     for team in teams: 
                         if(re.sub(' +', ' ',team.owner) == owner):
                                 Owners[re.sub(' +', ' ',owner)]['points_for'] += team.points_for
@@ -82,7 +82,7 @@ class LeagueView(APIView):
         year=int(request.data['year_started'])
         while year < 2022:
             print(year)
-            league = League(league_id=216415, year=year,espn_s2='AEAylLD7uSQQ7%2BenPr6av1H%2Fx0Hqbbpn8Jvr91ngxM1ll5ynO685mhN%2BSujz9I1IyJ6B1aZWsLiMmuPsdFk71SYQkvPUHFtQUQgN1rEs1mw%2FpRA8iI91nOAVwg1hfGb6TsZtvTJ9XHRr8C3E6uwLX4Yep2Pet%2FYN8%2BDm3QO8mSqXzfPkyS%2BsX50Mc5uvzCgV4r1pLIRXr%2FqnlfTiWHYCgZniEerPTLNhQaKqgaHAVPjCWUdZcPncMY6n9EX1eQnpB17eCXyP%2Fq4DXNNuRnASpnl%2ByoPm2%2Babp9yBTSJOy4N5zg%3D%3D', swid='{D19D67CA-C981-4CA2-8463-AF4111D2E8E2}')
+            league = League(league_id=request.data['Espn_League_Id'], year=year,espn_s2=request.data['Espn_S2'], swid=request.data['Espn_Swid'])
 
             teams = league.teams
             for team in teams:
@@ -92,17 +92,21 @@ class LeagueView(APIView):
                 
             for week in weeks:
                 matchups = league.scoreboard(week)
-
                 for matchup in matchups:
                     if matchup.home_score > matchup.away_score:
                         Owners[re.sub(' +', ' ',matchup.home_team.owner)]['count'] = Owners[re.sub(' +', ' ',matchup.home_team.owner)]['count'] + 1
                         Owners[re.sub(' +', ' ',matchup.home_team.owner)][year].append(Owners[re.sub(' +', ' ',matchup.home_team.owner)]['count'])
-                        Owners[re.sub(' +', ' ',matchup.away_team.owner)][year].append(Owners[re.sub(' +', ' ',matchup.away_team.owner)]['count'])
-                    else:
+                        if not matchup.away_team:
+                            Owners[re.sub(' +', ' ',matchup.home_team.owner)]['count'] = Owners[re.sub(' +', ' ',matchup.home_team.owner)]['count']
+                        else:
+                            Owners[re.sub(' +', ' ',matchup.away_team.owner)][year].append(Owners[re.sub(' +', ' ',matchup.away_team.owner)]['count'])
+                    elif matchup.away_score > matchup.home_score:
                         Owners[re.sub(' +', ' ',matchup.away_team.owner)]['count'] = Owners[re.sub(' +', ' ',matchup.away_team.owner)]['count'] + 1
                         Owners[re.sub(' +', ' ',matchup.away_team.owner)][year].append(Owners[re.sub(' +', ' ',matchup.away_team.owner)]['count'])
                         Owners[re.sub(' +', ' ',matchup.home_team.owner)][year].append(Owners[re.sub(' +', ' ',matchup.home_team.owner)]['count'])
-            
+                    else:
+                        Owners[re.sub(' +', ' ',matchup.home_team.owner)]['count'] = Owners[re.sub(' +', ' ',matchup.home_team.owner)]['count']
+
                 for owner in instanceOwners:
                     if owner not in currentOwners:
                         Owners[owner][year].append(Owners[owner]['count']) 
@@ -131,63 +135,6 @@ class LeagueView(APIView):
 
 class LeagueDetail(APIView):
     def get_object(self, espn_league_id):
-        # Returns an object instance that should 
-        # be used for detail views.
-        # Owners = League_Mod.objects.get(Espn_League_Id=espn_league_id).bigdata
-        # Chartdata = []
-        # # print(Owners['Jordan Freundlich'][startyear])
-
-        # for owner in Owners:
-        # #     # print(type(owner))
-        # #   
-        #     startyearget = League_Mod.objects.get(Espn_League_Id=espn_league_id).year_started
-        #     startyearint = int(startyearget)
-        #     startyearstr = str(startyearget)
-        #     wins = []
-        #     while startyearint < 2022:
-        #         # print(startyearint)
-        #         for item in Owners[owner][startyearstr]:
-        #             # print(item)
-        #             startyearint += 1
-        #             wins.append(item)
-        #             startyearint += 1
-        #     # print(wins)
-            
-        #     ownerdic = {
-        #         'type': "spline",
-        #         'visible': True,
-        #         'showInLegend': True,
-        #         'yValueFormatString': "## wins",
-        #         'name': owner,
-        #         'dataPoints': []
-        #     }
-
-        #     week = 0
-        #     yearget = League_Mod.objects.get(Espn_League_Id=espn_league_id).year_started
-        #     yearint = int(yearget)
-        #     for win in wins: 
-        #         week+= 1
-        #         if week == 17:
-        #             week = 1
-        #             yearint += 1
-        #         dic = {
-        #             'label': f"{yearint} Week {week}",
-        #             'y': win
-        #         }
-        #         ownerdic['dataPoints'].append(dic)
-        #     Chartdata.append(ownerdic)
-        # # print(Chartdata)
-
-        # leagueDetail = {
-        #     'host' : League_Mod.objects.get(Espn_League_Id=espn_league_id).host,
-        #     'year_started': League_Mod.objects.get(Espn_League_Id=espn_league_id).year_started,
-        #     'Espn_League_Id' :League_Mod.objects.get(Espn_League_Id=espn_league_id).Espn_League_Id,
-        #     'bigdata' : Chartdata
-        # }
-
-        # print(leagueDetail)
-
-        # print(League_Mod.objects.get(Espn_League_Id=espn_league_id).bigdata)
         try:
             return League_Mod.objects.get(Espn_League_Id=espn_league_id)
         except League_Mod.DoesNotExist:
@@ -279,6 +226,21 @@ class LeagueDetail(APIView):
 #             serializer.save()
 #             return Response(serializer.data)
 #         return Response('league was updated')
+
+class LeagueDetailByIDView(APIView):
+    def get_object(self, espn_league_id):
+        # Returns an object instance that should 
+        # be used for detail views.
+        try:
+            return League_Mod.objects.get(Espn_League_Id=espn_league_id)
+        except League_Mod.DoesNotExist:
+            raise Http404
+  
+    def get(self, request, espn_league_id, format=None):
+        league = self.get_object(espn_league_id)
+        serializer = LeagueSerializer(league)
+        return Response(serializer.data)
+
 
 class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = MyTokenObtainPairSerializer
