@@ -12,6 +12,10 @@ class LeagueSerializer(serializers.ModelSerializer):
         model = League_Mod
         fields = ['host','year_started' ,'Espn_League_Id','Espn_S2','Espn_Swid','bigdata',]
 
+# class MergeSerializer(serializers.ModelSerializer):
+#     class Meta:
+        
+
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user):
