@@ -14,6 +14,7 @@ def generate_unique_code():
 
 # Create your models here.
 class League_Mod(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     host = models.CharField(max_length=50)
     year_started = models.IntegerField(default=0)
     Espn_League_Id = models.IntegerField(unique = True)

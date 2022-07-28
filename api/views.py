@@ -25,6 +25,8 @@ class LeagueView(APIView):
   
     def post(self, request):
 
+        print(self.request.user)
+
         instanceOwners=[]
         year = int(request.data['year_started'])
         print(year)
@@ -119,6 +121,7 @@ class LeagueView(APIView):
             Owners[Owner]['legacypoints'] = legacypoints
         
         league_data = {
+            'user' : request.data['user'],
             'host' : request.data['host'],
             'year_started': request.data['year_started'],
             'Espn_League_Id' :request.data['Espn_League_Id'],
@@ -185,9 +188,10 @@ class LeagueDetail(APIView):
                 }
                 ownerdic['dataPoints'].append(dic)
             Chartdata.append(ownerdic)
-        print(Chartdata)
+        # print(Chartdata)
 
         leagueDetail = {
+            'user' : League_Mod.objects.get(Espn_League_Id=espn_league_id).user,
             'host' : League_Mod.objects.get(Espn_League_Id=espn_league_id).host,
             'Espn_S2': League_Mod.objects.get(Espn_League_Id=espn_league_id).Espn_S2,
             'Espn_Swid': League_Mod.objects.get(Espn_League_Id=espn_league_id).Espn_Swid,
@@ -196,7 +200,7 @@ class LeagueDetail(APIView):
             'bigdata' : Chartdata
         }
 
-        # print(leagueDetail)
+        print(leagueDetail)
 
 
         serializer = LeagueSerializer(leagueDetail)
