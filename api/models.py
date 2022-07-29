@@ -22,6 +22,7 @@ class League_Mod(models.Model):
     Espn_S2 = models.CharField(max_length=3000)
     Espn_Swid = models.CharField(max_length=300) 
     bigdata = models.JSONField(default=dict,null=True)
+    standings = models.JSONField(default=dict,null=True)
 
 class User_Leagues(models.Model):
     user = models.OneToOneField(User, on_delete = models.CASCADE)

@@ -34,12 +34,23 @@ class LeagueView(APIView):
         Owners = {
 
         }
+        yearStandings = {
+
+        }
         ##### Dicitonaries of Total Wins By Week #######
         while year < 2022:
             league = League(league_id=request.data['Espn_League_Id'], year=year,espn_s2=request.data['Espn_S2'], swid=request.data['Espn_Swid'])
             teams = league.teams
+
+            yearStandings.update({year: []})
+
             # Creates list of every owner
             for team in teams:
+                yearStandings[year].append({
+                'owner': team.owner,
+                'wins' : team.wins,
+                'losses' : team.losses
+                })
                 if re.sub(' +', ' ',team.owner) not in instanceOwners:
                         instanceOwners.append(re.sub(' +', ' ',team.owner))
             print(year)
@@ -128,6 +139,7 @@ class LeagueView(APIView):
             'Espn_S2' : request.data['Espn_S2'],
             'Espn_Swid' : request.data['Espn_Swid'],
             'bigdata' : Owners,
+            'standings' : yearStandings
         }
         # request.data['BigData'] = Owners
         serializer = LeagueSerializer(data=league_data)
