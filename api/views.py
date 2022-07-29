@@ -22,7 +22,7 @@ class LeagueView(APIView):
         league = [ {'host': league.host, 'year_started': league.year_started, 'Espn_League_Id': league.Espn_League_Id,'Espn_S2': league.Espn_S2,'Espn_Swid': league.Espn_Swid, 'bigdata': league.bigdata} 
         for league in League_Mod.objects.all()]
         return Response(league)
-  
+
     def post(self, request):
 
         print(self.request.user)
@@ -219,6 +219,47 @@ class LeagueDetail(APIView):
         league.delete()
         return Response('league is deleted')
   
+
+
+class BarChart(APIView):
+    def get_object(self, espn_league_id):
+        try:
+            return League_Mod.objects.get(Espn_League_Id=espn_league_id)
+        except League_Mod.DoesNotExist:
+            raise Http404
+    def get(self, request, espn_league_id, format=None):
+        league = self.get_object(espn_league_id)
+
+        Owners = League_Mod.objects.get(Espn_League_Id=espn_league_id).bigdata
+        Chartdata = []
+        # print(Owners['Jordan Freundlich'][startyear])
+
+        for owner in Owners:
+        #     # print(type(owner))
+        #   
+            ownerdic = {
+                'label': Owners[owner]['name'],
+                'y': Owners[owner]['points_for']
+                }
+
+            Chartdata.append(ownerdic)
+        # print(Chartdata)
+
+        leagueDetail = {
+            'user' : League_Mod.objects.get(Espn_League_Id=espn_league_id).user,
+            'host' : League_Mod.objects.get(Espn_League_Id=espn_league_id).host,
+            'Espn_S2': League_Mod.objects.get(Espn_League_Id=espn_league_id).Espn_S2,
+            'Espn_Swid': League_Mod.objects.get(Espn_League_Id=espn_league_id).Espn_Swid,
+            'year_started': League_Mod.objects.get(Espn_League_Id=espn_league_id).year_started,
+            'Espn_League_Id' :League_Mod.objects.get(Espn_League_Id=espn_league_id).Espn_League_Id,
+            'bigdata' : Chartdata
+        }
+        print(leagueDetail)
+        serializer = LeagueSerializer(leagueDetail)
+        return Response(serializer.data)
+
+
+
 # class MergeOwners(APIView):
 #     serializer_class = MergeSerializer
 
@@ -244,6 +285,32 @@ class LeagueDetailByIDView(APIView):
         league = self.get_object(espn_league_id)
         serializer = LeagueSerializer(league)
         return Response(serializer.data)
+
+
+class UserLeagueByIDView(APIView):
+    # def get(self, request):
+    #     # userleague = [{'user': userleague.user, 'league': userleague.league}
+    #     # for userleague in User_Leagues.objects.all()]
+    #     # return Response(userleague)
+
+    def get_object(self, user_id):
+        # Returns an object instance that should 
+        # be used for detail views.
+        try:
+            return User_Leagues.objects.get(user=user_id)
+        except League_Mod.DoesNotExist:
+            raise Http404
+  
+    def get(self, request, user_id, format=None):
+        league = self.get_object(user_id)
+        serializer = UserLeagueSerializer(league)
+        return Response(serializer.data)
+
+    def post(self, request):
+        serializer = UserLeagueSerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            return  Response(serializer.data)
 
 
 class MyTokenObtainPairView(TokenObtainPairView):

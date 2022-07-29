@@ -14,7 +14,11 @@ class LeagueSerializer(serializers.ModelSerializer):
 
 # class MergeSerializer(serializers.ModelSerializer):
 #     class Meta:
-        
+
+class UserLeagueSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User_Leagues
+        fields = ['user', 'league']
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
