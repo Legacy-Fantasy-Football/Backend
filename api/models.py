@@ -25,7 +25,7 @@ class League_Mod(models.Model):
     standings = models.JSONField(default=dict,null=True)
 
 class User_Leagues(models.Model):
-    user = models.OneToOneField(User, on_delete = models.CASCADE)
+    user = models.ForeignKey(User, on_delete = models.CASCADE)
     league = models.IntegerField(default=0)
 
 # class CustomUser(AbstractUser):

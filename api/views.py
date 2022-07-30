@@ -298,25 +298,30 @@ class LeagueDetailByIDView(APIView):
         serializer = LeagueSerializer(league)
         return Response(serializer.data)
 
-
 class UserLeagueByIDView(APIView):
-    # def get(self, request):
-    #     # userleague = [{'user': userleague.user, 'league': userleague.league}
-    #     # for userleague in User_Leagues.objects.all()]
-    #     # return Response(userleague)
 
-    def get_object(self, user_id):
-        # Returns an object instance that should 
-        # be used for detail views.
-        try:
-            return User_Leagues.objects.get(user=user_id)
-        except League_Mod.DoesNotExist:
-            raise Http404
+    serializer_class = UserLeagueSerializer
+    def get(self, request):
+        # userleague = [{'user': userleague.user, 'league': userleague.league}
+        # for userleague in User_Leagues.objects.all()]
+        # return Response(userleague)
+
+        data = User_Leagues.objects.filter().values_list()
+        responseData = list(data)
+        return Response(responseData)
+
+    # def get_object(self, user_id):
+    #     # Returns an object instance that should 
+    #     # be used for detail views.
+    #     try:
+    #         return User_Leagues.objects.all().filter(user=user_id)
+    #     except League_Mod.DoesNotExist:
+    #         raise Http404
   
-    def get(self, request, user_id, format=None):
-        league = self.get_object(user_id)
-        serializer = UserLeagueSerializer(league)
-        return Response(serializer.data)
+    # def get(self, request, user_id, format=None):
+    #     league = self.get_object(user_id)
+    #     serializer = UserLeagueSerializer(league)
+    #     return Response(serializer.data)
 
     def post(self, request):
         serializer = UserLeagueSerializer(data=request.data)

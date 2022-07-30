@@ -24,7 +24,7 @@ urlpatterns = [
     path('wins/<int:espn_league_id>/', LeagueDetail.as_view(), name="leagueDetail"),
     path('points/<int:espn_league_id>/', BarChart.as_view(), name="leagueDetail"),
     path('wel/<int:espn_league_id>/', LeagueDetailByIDView.as_view(), name="leagueDetail"),
-    path('leagues/<int:user_id>/', UserLeagueByIDView.as_view(), name="userleagues"),
+    path('leagues/', UserLeagueByIDView.as_view(), name="userleagues"),
     # path('wel/<int:espn_league_id>/merge', MergeOwners.as_view(), name="leagueDetail"),
     path('api/', include("api.urls")),
 ]
