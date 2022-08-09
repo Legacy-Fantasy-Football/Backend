@@ -21,6 +21,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('django.contrib.auth.urls')),
     path('wel/', LeagueView.as_view(), name="something"),
+    path('newwel/', NewCreateLeagueView.as_view(), name="something"),
+    path('newwel/<int:espn_league_id>/', NewCreateLeagueDetialView.as_view(), name="something"),
     path('wins/<int:espn_league_id>/', LeagueDetail.as_view(), name="leagueDetail"),
     path('points/<int:espn_league_id>/', BarChart.as_view(), name="leagueDetail"),
     path('wel/<int:espn_league_id>/', LeagueDetailByIDView.as_view(), name="leagueDetail"),
