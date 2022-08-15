@@ -275,7 +275,7 @@ class LeagueDetail(APIView):
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
-        return Response('league was updated')
+        
 
     def delete(self, request, espn_league_id, format=None):
         league = self.get_object(espn_league_id)
@@ -475,14 +475,18 @@ class NewCreateLeagueDetialView(APIView):
         leagueModel = self.get_object(espn_league_id)
 
         currentOwners =[]
-
+        print(request.data)
         standingsstr = request.data['standings']
-        standings = json.loads(standingsstr)
+        standings = request.data['standings']
+        # standings = json.loads(standingsstr)
         Ownersstr = request.data['bigdata']
-        Owners = json.loads(Ownersstr)
+        Owners = request.data['bigdata']
+        # Owners = json.loads(Ownersstr)
         instanceOwnersstr = request.data['owners']
-        instanceOwners = json.loads((instanceOwnersstr))
+        instanceOwners = request.data['owners']
+        # instanceOwners = json.loads((instanceOwnersstr))
         year = int(request.data['year'])
+        print(year)
 
         league = League(league_id=request.data['Espn_League_Id'], year=year,
                             espn_s2=request.data['Espn_S2'], swid=request.data['Espn_Swid'])
@@ -560,11 +564,10 @@ class NewCreateLeagueDetialView(APIView):
         # print(league_data)
 
         serializer = LeagueSerializer(leagueModel,data=league_data)
-        # print(serializer)
-        if serializer.is_valid():
+        print(serializer)
+        if serializer.is_valid(raise_exception=True):
             serializer.save()
             return Response(serializer.data)
-        return Response('league was updated')
 
 
 class MyTokenObtainPairView(TokenObtainPairView):
