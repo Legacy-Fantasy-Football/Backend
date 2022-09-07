@@ -47,7 +47,7 @@ class LeagueView(APIView):
                             espn_s2=request.data['Espn_S2'], swid=request.data['Espn_Swid'])
             teams = league.teams
 
-            # Creates the structure for my strandings
+            # Creates the structure for my standings
             yearStandings.update({year: []})
 
             # Creates list of every owner
@@ -193,12 +193,14 @@ class LeagueView(APIView):
 
 
 class LeagueDetail(APIView):
+
     def get_object(self, espn_league_id):
         try:
             return League_Mod.objects.get(Espn_League_Id=espn_league_id)
         except League_Mod.DoesNotExist:
             raise Http404
 
+    # GETS LEAGUE DATA AND MANIPULATES IT TO BE CHART READY FOR WINS
     def get(self, request, espn_league_id, format=None):
         league = self.get_object(espn_league_id)
 
@@ -235,7 +237,7 @@ class LeagueDetail(APIView):
                 'dataPoints': []
             }
 
-            # loops through each item in the owners wins list and turns it into a deperate dictionary, of label and y.
+            # loops through each item in the owners wins list and turns it into a Seperate dictionary, of label and y.
             week = 0
             yearget = League_Mod.objects.get(
                 Espn_League_Id=espn_league_id).year_started
@@ -282,14 +284,15 @@ class LeagueDetail(APIView):
         league.delete()
         return Response('league is deleted')
 
-
 class BarChart(APIView):
+
     def get_object(self, espn_league_id):
         try:
             return League_Mod.objects.get(Espn_League_Id=espn_league_id)
         except League_Mod.DoesNotExist:
             raise Http404
 
+     # GETS LEAGUE DATA AND MANIPULATES IT TO BE CHART READY FOR points barchart
     def get(self, request, espn_league_id, format=None):
         league = self.get_object(espn_league_id)
 
@@ -321,19 +324,6 @@ class BarChart(APIView):
         serializer = LeagueSerializer(leagueDetail)
         return Response(serializer.data)
 
-
-# class MergeOwners(APIView):
-#     serializer_class = MergeSerializer
-
-#     def put(selfmrequest,espn_league_id, format = None):
-#         league = self.get_object(espn_league_id)
-#         print(request.data)
-#         serializer = MergeSerializer(data=request.data)
-#         if serializer.is_valid():
-#             serializer.save()
-#             return Response(serializer.data)
-#         return Response('league was updated')
-
 class LeagueDetailByIDView(APIView):
     def get_object(self, espn_league_id):
         # Returns an object instance that should
@@ -343,6 +333,7 @@ class LeagueDetailByIDView(APIView):
         except League_Mod.DoesNotExist:
             raise Http404
 
+    # THIS IS THE MAIN GET FUNCTION OF DASHBOARD. GETS AND RETURNS ALL DATA
     def get(self, request, espn_league_id, format=None):
         league = self.get_object(espn_league_id)
         serializer = LeagueSerializer(league)
@@ -353,6 +344,7 @@ class UserLeagueByIDView(APIView):
 
     serializer_class = UserLeagueSerializer
 
+    # Gets all the leagues. 
     def get(self, request):
         # userleague = [{'user': userleague.user, 'league': userleague.league}
         # for userleague in User_Leagues.objects.all()]
@@ -361,7 +353,7 @@ class UserLeagueByIDView(APIView):
         data = User_Leagues.objects.filter().values_list()
         responseData = list(data)
         return Response(responseData)
-
+    #Creates a new league in user league lists. 
     def post(self, request):
         serializer = UserLeagueSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
@@ -378,6 +370,7 @@ class NewCreateLeagueView(APIView):
         for league in League_Mod.objects.all()]
         return Response(league)
 
+    # This creates the architecture for the league model. 
     def post(self, request):
 
         print(self.request.user)
@@ -417,7 +410,11 @@ class NewCreateLeagueView(APIView):
             year += 1
         print(instanceOwners)
         print(yearStandings)
+
+        #Reset Year
         year = int(request.data['year_started'])
+
+        #Loop 2
         while year < 2022:
             league = League(league_id=request.data['Espn_League_Id'], year=year,espn_s2=request.data['Espn_S2'], swid=request.data['Espn_Swid'])
             team_count = league.settings.team_count
@@ -470,7 +467,7 @@ class NewCreateLeagueDetialView(APIView):
         serializer = LeagueSerializer(league)
         return Response(serializer.data)
 
-
+    # adds each input year to bigdata
     def put(self, request, espn_league_id, format=None):
         leagueModel = self.get_object(espn_league_id)
 
@@ -578,6 +575,19 @@ class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
     permission_classes = (AllowAny,)
     serializer_class = RegisterSerializer
+
+
+# class MergeOwners(APIView):
+#     serializer_class = MergeSerializer
+
+#     def put(selfmrequest,espn_league_id, format = None):
+#         league = self.get_object(espn_league_id)
+#         print(request.data)
+#         serializer = MergeSerializer(data=request.data)
+#         if serializer.is_valid():
+#             serializer.save()
+#             return Response(serializer.data)
+#         return Response('league was updated')
 
 
 @api_view(['GET'])
